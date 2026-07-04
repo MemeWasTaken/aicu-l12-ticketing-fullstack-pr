@@ -63,7 +63,7 @@ function seedTickets() {
     "Errore login su account amministrativo.",
     "alta",
     "email",
-    null,
+    computeUrgencyLabel("alta", "email"),
     "aperto",
     now
   );
@@ -75,16 +75,26 @@ function seedTickets() {
     "Errore intermittente nella pagina fatture.",
     "normale",
     "chat",
-    null,
+    computeUrgencyLabel("normale", "chat"),
     "in lavorazione",
     now
   );
 }
 
 function computeUrgencyLabel(priority, sourceChannel) {
-  // TODO L12: implementare la formula priority + sourceChannel -> urgencyLabel.
-  // Non calcolare questo valore nel client.
-  return null;
+  if (priority === "alta") {
+    if (sourceChannel === "telefono") {
+      return "intervento rapido";
+    }
+    return "prioritario";
+  }
+  if (priority === "normale") {
+    if (sourceChannel === "email") {
+      return "standard";
+    }
+    return "da gestire";
+  }
+  return "monitorare";
 }
 
 function validateTicketInput(input) {
@@ -102,8 +112,9 @@ function validateTicketInput(input) {
     fieldErrors.priority = "Priorita' non valida.";
   }
 
-  // TODO L12: validare sourceChannel usando validSourceChannels.
-  // Il valore whatsapp deve produrre fieldErrors.sourceChannel.
+  if (!validSourceChannels.includes(input.sourceChannel)) {
+    fieldErrors.sourceChannel = "Canale non valido.";
+  }
 
   return fieldErrors;
 }
